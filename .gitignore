@@ -1,0 +1,23 @@
+# UE 生成目录
+Binaries/
+Build/*/
+DerivedDataCache/
+Intermediate/
+Saved/
+
+# IDE
+.vs/
+.idea/
+.vscode/
+*.sln
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+
+# 其他
+*.pdb
+*.log
+*.tmp
+.DS_Store

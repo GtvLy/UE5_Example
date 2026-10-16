@@ -1,0 +1,58 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
+#include "PickupsGameMode.h"
+
+#include "PickupsCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "PickupsGameState.h"
+
+APickupsGameMode::APickupsGameMode()
+{
+	
+}
+
+void APickupsGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+	MyGameState = GetGameState<APickupsGameState>();
+}
+
+bool APickupsGameMode::ShouldSpawnAtStartSpot(AController* Player)
+{
+	return false;
+}
+
+void APickupsGameMode::HandleMatchHasStarted()
+{
+	Super::HandleMatchHasStarted();
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, "The game has started!");
+}
+
+void APickupsGameMode::HandleMatchHasEnded()
+{
+	Super::HandleMatchHasEnded();
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "The game has ended!");
+	TArray<AActor*> Characters;
+	UGameplayStatics::GetAllActorsOfClass(this, APickupsCharacter::StaticClass(), Characters);
+	for (AActor* Character : Characters)
+	{
+		Character->Destroy();
+	}
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &APickupsGameMode::RestartMap, 5.0f);
+}
+
+bool APickupsGameMode::ReadyToStartMatch_Implementation()
+{
+	return true;
+}
+
+bool APickupsGameMode::ReadyToEndMatch_Implementation()
+{
+	return MyGameState != nullptr && !MyGameState->HasPickups();
+}
+
+void APickupsGameMode::RestartMap() const
+{
+	GetWorld()->ServerTravel(GetWorld()->GetName(), false, false);
+}
